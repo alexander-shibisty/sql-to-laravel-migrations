@@ -1,0 +1,15 @@
+{
+    "name": "poolc/sqlparser",
+    "require": {
+        "phpmyadmin/sql-parser": "^4.2",
+        "monolog/monolog": "^1.23"
+    },
+    "autoload": {
+        "psr-4": {
+            "SqlParser\\": "src/"
+        },
+        "files": ["helpers.php"]
+    },
+    "require-dev": {
+    }
+}
