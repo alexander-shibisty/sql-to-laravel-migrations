@@ -5,6 +5,8 @@ use PhpMyAdmin\SqlParser\Utils\Query;
 
 use PhpMyAdmin\SqlParser\Components\Key;
 
+use \SqlFormatter;
+
 use SqlParser\Types\{
     IntegerType,
     VarcharType,
@@ -27,7 +29,7 @@ class SqlParser {
     private $inputPath;
     private $outputPath;
 
-    public function __construct($inputPath, $outputPath) {
+    public function __construct(string $inputPath, string $outputPath) {
         $this->inputPath = $inputPath;
         $this->outputPath = $outputPath;
 
@@ -41,18 +43,20 @@ class SqlParser {
         foreach($inputFiles as $inputFile) {
             if($inputFile !== '.' && $inputFile !== '..' && preg_match('/\.sql$/', $inputFile)) {
                 $query = file_get_contents($this->inputPath.'/'.$inputFile);
-                
+                $query = SqlFormatter::removeComments($query);
+                $query = str_replace(';', '', $query);
+                $query = SqlFormatter::format($query, false);
+
                 //Получаем массив данных
                 $parser = new Parser($query);
-                
+
                 //Работаем с отдельными командами из файла
                 $templates = $this->statements($parser->statements);
-
+                
                 //Создаем файлы миграций
                 foreach($templates as $fileName => $fileTemplate) {
                     file_put_contents($this->outputPath.'/'.$fileName.'.php', $fileTemplate);
                 }
-                
             }
         }
     }
